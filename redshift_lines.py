@@ -1,3 +1,5 @@
+# Authors: Raquel Valença and Lilianne Nakazono
+
 import os
 import numpy as np
 import pandas as pd
