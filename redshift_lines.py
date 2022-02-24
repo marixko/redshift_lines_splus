@@ -2,12 +2,14 @@ import os
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import matplotlib
 import streamlit as st
+matplotlib.use('Agg')
+
+plt.rcParams.update({'font.size': 20})
 
 st.title('Spectral lines: in which S-PLUS band we observe them?')
 
-mycwd = os.path.abspath(os.getcwd())
-filters_path = os.path.join(mycwd, 'filters')
 
 ls = {'Ly_alpha': 1215.24, 'C_IV': 1549.48, 'C_III': 1908.734,
         'Mg_II': 2799.117, 'H_gamma': 4341.68, 'H_beta': 4862.68, 'H_alpha': 6564.61}
@@ -31,7 +33,7 @@ def lambdas_obs(z):
 
 def loc_lines(z, zline=False, lobs_lines=False):
 
-    fig, ax = plt.subplots(figsize=(12, 7))
+    fig, ax = plt.subplots(figsize=(17, 8))
 
     filter_colors = ['#030381', '#a426da', '#0000ff', '#2c97ff', '#09c1c1', '#53e3d5',
             '#33ff33', '#aeff33', '#ffb020', '#ff8c00', '#ff8c00', '#ff0000']
@@ -39,7 +41,7 @@ def loc_lines(z, zline=False, lobs_lines=False):
 
     for i in range(len(names)):
         
-        filter_path = os.path.join(filters_path, f'{names[i]}.dat')
+        filter_path = os.path.join('filters', f'{names[i]}.dat')
         df = pd.read_csv(filter_path, sep=' ', names=['lambda', names[i]])
         
         if 'F' in names[i]:
@@ -61,7 +63,7 @@ def loc_lines(z, zline=False, lobs_lines=False):
     for line in lines:
         ax.axvline(lines[line], label=line, c=lines_colors[i])
         if lobs_lines:
-            ax2.plot(lobs, redshift(ls[line], lobs), ls='--', lw=1, c=lines_colors[i])
+            ax2.plot(lobs, redshift(ls[line], lobs), ls='--', linewidth=6, c=lines_colors[i])
         i += 1
 
     ax.grid()
@@ -70,10 +72,12 @@ def loc_lines(z, zline=False, lobs_lines=False):
     ax.set_xticks(np.arange(3000, 11000, 500))
     ax.set_xlabel('Wavelength (Å)')
     ax.set_ylabel('$R_{\lambda}$ [%]')
-    ax.set_title(f'z = {z}', size=16)
+    ax.set_title(f'z = {z}', size=22)
 
-    fig.legend(ncol=7, fontsize=12, loc='upper center')
-    plt.show()
+    fig.legend(ncol=7, fontsize=15, loc='upper center')
+    # plt.show()
+    return fig
 
-st.pyplot(loc_lines(st.slider('Redshift', 0, 7, 0, step = 0.01)))
+fig = loc_lines(st.slider('Redshift', 0.0, 7.0, 0.0, step = 0.01))
+st.pyplot(fig)
 
